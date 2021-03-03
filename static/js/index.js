@@ -1,10 +1,20 @@
-const predefinedOptions = [
-    "Иван",
-    "Евгений",
-    "Анна",
-    "Руслан",
-    "Арман"
-];
+const queryString = window.location.search
+    // Remove the `?` character
+    .slice(1);
+const query = parseQueryString(queryString);
+
+const predefinedOptions = query.options ?
+    Array.isArray(query.options) ?
+        query.options : [query.options] :
+        [
+            "Иван",
+            "Евгений",
+            "Анна",
+            "Руслан",
+            "Арман",
+            "Максим",
+            "Андрей"
+        ];
 
 $(document).ready(() => {
     for (const option of predefinedOptions) {
@@ -13,6 +23,35 @@ $(document).ready(() => {
 });
 
 const optionsDivIdPrefix = "option-div";
+
+function parseQueryString(queryString) {
+    const keyValueSubstrings = queryString
+        .split("&")
+        // Omit empty substrings
+        .filter(string => !!string);
+
+    const result = keyValueSubstrings.reduce((result, queryParam) => {
+        const delimiterIndex = queryParam.indexOf("=");
+        const key = decodeURIComponent(queryParam.slice(0, delimiterIndex));
+        let value = decodeURIComponent(queryParam.slice(delimiterIndex + 1));
+        if (value.includes("+")) {
+            value = value.split("+");
+        }
+
+        if (result[key]) {
+            const preparedValue = Array.isArray(value) ? value : [value];
+            if (Array.isArray(result[key])) {
+                result[key].push(...preparedValue);
+            } else {
+                result[key] = [result[key], ...preparedValue];
+            }
+        } else {
+            result[key] = value;
+        }
+        return result;
+    }, {});
+    return result;
+}
 
 function addNewOption(optionTitle) {
     const optionsList = $('#options-list');
