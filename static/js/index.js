@@ -139,7 +139,7 @@ function generateShuffledSchedule(a, b) {
     }
 
     for (let i = b - 1; i >= a; i--) {
-        const j = Math.floor(Math.random() * i);
+        const j = Math.floor(Math.random() * (i + 1));
         const temp = result[j];
         result[j] = result[i];
         result[i] = temp;
