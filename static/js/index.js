@@ -7,13 +7,13 @@ const predefinedOptions = query.options ?
     Array.isArray(query.options) ?
         query.options : [query.options] :
         [
-            "Иван",
-            "Евгений",
-            "Анна",
-            "Руслан",
-            "Арман",
-            "Максим",
-            "Андрей"
+            "Яблоко",
+            "Ананас",
+            "Банан",
+            "Груша",
+            "Киви",
+            "Манго",
+            "Апельсин"
         ];
 
 $(document).ready(() => {
