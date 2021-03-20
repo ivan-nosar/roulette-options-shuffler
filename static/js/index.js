@@ -115,7 +115,7 @@ function onSpinClick() {
     const finalOptionsSequence = generateShuffledSchedule(1, options.length);
 
     // Run spinners
-    const startSpinTime = 600; // ms
+    const startSpinTime = Number(query.spinTime) > 0 ? Number(query.spinTime) : 600; // ms
     const spinTimeStep = 150; // ms
     let spinTime = startSpinTime;
     for (const optionIndex in finalOptionsSequence) {
