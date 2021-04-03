@@ -7,13 +7,13 @@ const predefinedOptions = query.options ?
     Array.isArray(query.options) ?
         query.options : [query.options] :
         [
-            "Яблоко",
-            "Ананас",
-            "Банан",
-            "Груша",
-            "Киви",
-            "Манго",
-            "Апельсин"
+            "Apple",
+            "Pineapple",
+            "Banana",
+            "Pear",
+            "Kiwi",
+            "Mango",
+            "Orange"
         ];
 
 $(document).ready(() => {
