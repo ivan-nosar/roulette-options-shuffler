@@ -18,19 +18,59 @@
 </head>
 
 <body>
-    <div class="container-fluid my-3">
-        <div class="row">
+    <ul class="nav nav-tabs" id="navigation-bar" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="roulette-tab" data-toggle="tab" href="#roulette" role="tab"
+                aria-controls="roulette" aria-selected="true">
+                Roulette
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="analytics-tab" data-toggle="tab" href="#analytics" role="tab"
+                aria-controls="analytics" aria-selected="false">
+                Analytics
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content" id="navigation-content">
+        <!-- Roulette tab -->
+        <div class="tab-pane fade show active" id="roulette" role="tabpanel" aria-labelledby="roulette-tab">
+            <div class="container-fluid my-3">
+                <div class="row">
 
-            <div class="col-3">
-                <button id="playFancy" type="button" class="btn btn-success btn-lg btn-block mb-5" onclick="onSpinClick()">Spin the drum!</button>
-                <div>
-                    <h2 class="text-center">Set your options</h2>
-                    <ul id="options-list" class="list-group"></ul>
+                    <div class="col-3">
+                        <button type="button" class="btn btn-success btn-lg btn-block mb-5"
+                            onclick="onSpinClick()">Spin the drum!</button>
+                        <div>
+                            <h2 class="text-center">Set your options</h2>
+                            <ul id="options-list" class="list-group"></ul>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-block mt-1"
+                            onclick="onAddOptionClick()">+</button>
+                    </div>
+
+                    <div id="slots-root" class="col-9"></div>
                 </div>
-                <button type="button" class="btn btn-outline-primary btn-block mt-1" onclick="onAddOptionClick()">+</button>
             </div>
+        </div>
 
-            <div id="slots-root" class="col-9"></div>
+        <!-- Analytics tab -->
+        <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+            <button type="button" class="btn btn-primary btn-lg btn-block"
+                onclick="recalculateAnalytics()">Recalculate</button>
+            <div class="container-fluid my-3">
+                <div class="row row-cols-2">
+                    <div class="col">
+                        <canvas id="topFirstChart"></canvas>
+                    </div>
+                    <div class="col">
+                        <canvas id="topLastChart"></canvas>
+                    </div>
+                    <div class="col">
+                        <canvas id="topRemainingChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -44,8 +84,14 @@
     <script src="./static/js/slotmachine/bootstrap.min.js"></script>
     <script src="./static/js/slotmachine/slotmachine.min.js"></script>
 
+    <!-- Chart.js scripts -->
+    <script src="./static/js/Chart.js/chart.min.js"></script>
+
     <!-- Site logic -->
+    <script src="./static/js/database.js"></script>
     <script src="./static/js/index.js"></script>
+    <script src="./static/js/roulette.js"></script>
+    <script src="./static/js/visualize-analytics.js"></script>
 </body>
 
 </html>
