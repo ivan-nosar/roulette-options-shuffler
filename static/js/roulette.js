@@ -5,16 +5,12 @@ function addNewOption(optionTitle) {
     const newIndex = optionsList[0].childElementCount;
 
     const optionDivId = `${optionsDivIdPrefix}-${newIndex}`;
-    const svgIconMarkup = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-    </svg>`;
     const optionDivMarkup = `
         <li class="input-group my-1" id="${optionDivId}">
             <input class="form-control" type="text" placeholder="Set your option" value="${optionTitle}">
             <div class="input-group-append">
                 <button class="btn btn-outline-primary" type="button" onclick="deleteOption('${optionDivId}')">
-                    ${svgIconMarkup}
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
         </li>`;
