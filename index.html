@@ -18,20 +18,67 @@
 </head>
 
 <body>
-    <ul class="nav nav-tabs" id="navigation-bar" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="roulette-tab" data-toggle="tab" href="#roulette" role="tab"
-                aria-controls="roulette" aria-selected="true">
-                Roulette
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="analytics-tab" data-toggle="tab" href="#analytics" role="tab"
-                aria-controls="analytics" aria-selected="false">
-                Analytics
-            </a>
-        </li>
-    </ul>
+    <!-- Standard -->
+    <!-- <nav class="navbar navbar-light nav-tabs" style="padding-bottom: 0;">
+        <ul class="nav" id="navigation-bar" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="roulette-tab" data-toggle="tab" href="#roulette" role="tab"
+                    aria-controls="roulette" aria-selected="true">
+                    Roulette
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="analytics-tab" data-toggle="tab" href="#analytics" role="tab"
+                    aria-controls="analytics" aria-selected="false">
+                    Analytics
+                </a>
+            </li>
+        </ul>
+        <a class="nav-link p-1 mx-1" href="https://github.com/ivan-nosar/roulette-options-shuffler" target="_blank" rel="noopener" aria-label="GitHub">
+            <img
+                srcset="static/icons/GitHub-Mark/PNG/GitHub-Mark-120px.png 120w,
+                    static/icons/GitHub-Mark/PNG/GitHub-Mark-64px.png 64w,
+                    static/icons/GitHub-Mark/PNG/GitHub-Mark-32px.png 32w"
+                sizes="(max-width: 120px) 120px,
+                    (max-width: 64px) 64px,
+                    32px"
+                src="static/icons/GitHub-Mark/PNG/GitHub-Mark-32px.png"
+            >
+        </a>
+    </nav> -->
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="nav navbar-nav mr-auto" id="navigation-bar">
+                <li class="nav-item">
+                    <a class="nav-link active" id="roulette-tab" data-toggle="tab" href="#roulette"
+                        aria-controls="roulette" aria-selected="true">
+                        Roulette
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="analytics-tab" data-toggle="tab" href="#analytics" aria-controls="analytics"
+                        aria-selected="false">
+                        Analytics
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <a class="nav-link p-1 mx-1" href="https://github.com/ivan-nosar/roulette-options-shuffler" target="_blank"
+            rel="noopener" aria-label="GitHub">
+            <img srcset="static/icons/GitHub-Mark/GitHub-Mark-120px.png 120w,
+                    static/icons/GitHub-Mark/GitHub-Mark-64px.png 64w,
+                    static/icons/GitHub-Mark/GitHub-Mark-32px.png 32w" sizes="(max-width: 120px) 120px,
+                    (max-width: 64px) 64px,
+                    32px" src="static/icons/GitHub-Mark/GitHub-Mark-32px.png">
+        </a>
+    </nav>
+
     <div class="tab-content" id="navigation-content">
         <!-- Roulette tab -->
         <div class="tab-pane fade show active" id="roulette" role="tabpanel" aria-labelledby="roulette-tab">
@@ -39,8 +86,8 @@
                 <div class="row">
 
                     <div class="col-3">
-                        <button type="button" class="btn btn-success btn-lg btn-block mb-5"
-                            onclick="onSpinClick()">Spin the drum!</button>
+                        <button type="button" class="btn btn-success btn-lg btn-block mb-5" onclick="onSpinClick()">Spin
+                            the drum!</button>
                         <div>
                             <h2 class="text-center">Set your options</h2>
                             <ul id="options-list" class="list-group"></ul>
@@ -56,8 +103,6 @@
 
         <!-- Analytics tab -->
         <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
-            <button type="button" class="btn btn-primary btn-lg btn-block"
-                onclick="recalculateAnalytics()">Recalculate</button>
             <div class="container-fluid my-3">
                 <div class="row row-cols-2">
                     <div class="col">

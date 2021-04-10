@@ -42,9 +42,9 @@ function recalculateAnalytics() {
 
         const [topFirst, topLast, topRemaining] = calculatePredefinedChartsData(shuffles);
         [
-            {chartId: "topFirstChart", chartTitle: 'Top first shuffled options', data: topFirst},
-            {chartId: "topLastChart", chartTitle: 'Top last shuffled options', data: topLast},
-            {chartId: "topRemainingChart", chartTitle: 'Top remaining shuffled options', data: topRemaining}
+            {chartId: "topFirstChart", chartTitle: 'Top 5 first shuffled options', data: topFirst},
+            {chartId: "topLastChart", chartTitle: 'Top 5 last shuffled options', data: topLast},
+            {chartId: "topRemainingChart", chartTitle: 'Top 5 remaining shuffled options', data: topRemaining}
         ].forEach(({chartId, chartTitle, data}) => {
             var chartContext = document.getElementById(chartId).getContext("2d");
             charts.push(new Chart(chartContext, {
