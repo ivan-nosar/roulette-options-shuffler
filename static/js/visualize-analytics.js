@@ -45,41 +45,114 @@ function recalculateAnalytics() {
             {chartId: "topFirstChart", chartTitle: 'Top 5 first shuffled options', data: topFirst},
             {chartId: "topLastChart", chartTitle: 'Top 5 last shuffled options', data: topLast},
             {chartId: "topRemainingChart", chartTitle: 'Top 5 remaining shuffled options', data: topRemaining}
-        ].forEach(({chartId, chartTitle, data}) => {
-            var chartContext = document.getElementById(chartId).getContext("2d");
-            charts.push(new Chart(chartContext, {
-                type: 'bar',
-                data: {
-                    labels: data.map(optionStatistics => optionStatistics.title),
-                    datasets: [{
-                        data: data.map(optionStatistics => optionStatistics.value),
-                        backgroundColor: backgroundChartColors,
-                        borderColor: borderChartColors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: chartTitle,
-                            font: {
-                                size: 18
-                            }
-                        },
+        ].forEach(drawChart);
+
+        // An entry point to calculate and draw the complex or user-defined charts
+        const complexChartsCalculators = [
+            calculateTopMaxRemainingSubsequences(shuffles)
+        ];
+        Promise
+            .all(complexChartsCalculators)
+            .then(result => {
+                // Clean up all the previously dynamically created charts
+                $("div[id^='complex-chart-']").each(function() {
+                    $(this).remove();
+                });
+
+                return result;
+            })
+            .then(result => {
+                const chartsContainer = $("#charts-container");
+
+                for (const chartData of result) {
+                    // Validate result
+                    const validationError = validateComplexChartData(chartData);
+                    if (validationError) {
+                        console.error(validationError.message);
+                        console.error(validationError.dataItem);
+                        // TODO: Visualize the error message
+                        continue;
                     }
+
+                    // The chart's canvases will be generated dynamically
+                    const newChartMarkup = counstructNewChartMarkup(chartData.chartId);
+                    chartsContainer.append(newChartMarkup);
+
+                    // Draw the chart
+                    drawChart(chartData);
                 }
-            }));
-        })
+            },
+            error => {
+                console.error("Unable to calculate the complex charts data. The reason is as follows:");
+                console.error(error);
+                // TODO: Visualize the error message
+            });
     })
+}
+
+function drawChart({chartId, chartTitle, data}) {
+    const chartContext = document.getElementById(chartId).getContext("2d");
+    charts.push(new Chart(chartContext, {
+        type: 'bar',
+        data: {
+            labels: data.map(optionStatistics => optionStatistics.title),
+            datasets: [{
+                data: data.map(optionStatistics => optionStatistics.value),
+                backgroundColor: backgroundChartColors,
+                borderColor: borderChartColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: chartTitle,
+                    font: {
+                        size: 18
+                    }
+                },
+            }
+        }
+    }));
+}
+
+function validateComplexChartData(chartData) {
+    if (chartData.chartId === undefined) {
+        return {message: "The chart data doesn't contain the `chartId` property", dataItem: chartData};
+    }
+    if (chartData.chartTitle === undefined) {
+        return {message: "The chart data doesn't contain the `chartTitle` property", dataItem: chartData};
+    }
+    if (!Array.isArray(chartData.data)) {
+        return {message: "The chart data doesn't contain the `data` property that is Array", dataItem: chartData};
+    }
+    for (const dataItem of chartData.data) {
+        if (dataItem.title === undefined) {
+            return {
+                message: "The chart data has incorrect `data` property content: `title` property is required",
+                dataItem
+            };
+        }
+        if (dataItem.value === undefined) {
+            return {
+                message: "The chart data has incorrect `data` property content: `value` property is required",
+                dataItem
+            };
+        }
+    }
+}
+
+function counstructNewChartMarkup(chartId) {
+    return `<div id="complex-chart-${chartId}" class="col"><canvas id="${chartId}"></canvas></div>`;
 }
 
 function calculatePredefinedChartsData(shuffles) {
@@ -128,4 +201,62 @@ function calculatePredefinedChartsData(shuffles) {
         .slice(0, maxTopCount);
 
     return [topFirst, topLast, topRemaining];
+}
+
+async function calculateTopMaxRemainingSubsequences(shuffles) {
+    return new Promise(async (resolve) => {
+        const foundSubsequences = {};
+
+        for (const {original, shuffled} of shuffles) {
+            // Pre-calculation optimization:
+            // Find the first and the last common options in both arrays in order to decrease the search area
+            const firstCommonIndex = original.findIndex((option, index) => shuffled[index] === option);
+            let lastCommonIndex = original.length - 1;
+            for (; lastCommonIndex >= 0; lastCommonIndex--) {
+                if (original[lastCommonIndex] === shuffled[lastCommonIndex]) {
+                    break;
+                }
+            }
+
+            if (lastCommonIndex <= firstCommonIndex || firstCommonIndex === -1 || lastCommonIndex === -1) {
+                // No common subsequence found
+                // (every item of the `shuffled` array has been rearranged from the `original`)
+                // or the common subsequence consists of a single element
+                continue;
+            }
+
+            // Calculate the longest common continuous subsequence
+            let maxLength = 1;
+            let maxSubsequence = original[firstCommonIndex];
+            for (let i = firstCommonIndex + 1; i <= lastCommonIndex; i++) {
+                if (original[i] === shuffled[i]) {
+                    maxLength++;
+                    maxSubsequence += maxLength === 1 ? `${original[i]}` : `-${original[i]}`;
+                } else {
+                    maxLength = 0;
+                    maxSubsequence = "";
+                }
+            }
+
+            if (maxLength > 1) {
+                // Only subsequences that contain two or more options will be shown
+                if (foundSubsequences[maxSubsequence]) {
+                    foundSubsequences[maxSubsequence]++;
+                } else {
+                    foundSubsequences[maxSubsequence] = 1;
+                }
+            }
+        }
+
+        const data = Object.keys(foundSubsequences)
+            .map((subsequenceName) => ({title: subsequenceName, value: foundSubsequences[subsequenceName]}))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, maxTopCount);
+
+        resolve({
+            chartId: "topMaxRemainingSubsequences",
+            chartTitle: 'Top 5 maximum remaining shuffled subsequences',
+            data
+        });
+    });
 }
