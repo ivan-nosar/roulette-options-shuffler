@@ -40,38 +40,38 @@ function recalculateAnalytics() {
             }
         }
 
-        const [topFirst, topLast, topRemaining] = calculatePredefinedChartsData(shuffles);
-        [
-            {chartId: "topFirstChart", chartTitle: 'Top 5 first shuffled options', data: topFirst},
-            {chartId: "topLastChart", chartTitle: 'Top 5 last shuffled options', data: topLast},
-            {chartId: "topRemainingChart", chartTitle: 'Top 5 remaining shuffled options', data: topRemaining}
-        ].forEach(drawChart);
+        // Start asynchronous calculation of the predefined charts
+        calculatePredefinedChartsData(shuffles)
+            .then(([topFirst, topLast, topRemaining]) => {
+                [
+                    {chartId: "topFirstChart", chartTitle: 'Top 5 first shuffled options', data: topFirst},
+                    {chartId: "topLastChart", chartTitle: 'Top 5 last shuffled options', data: topLast},
+                    {chartId: "topRemainingChart", chartTitle: 'Top 5 remaining shuffled options', data: topRemaining}
+                ].forEach(drawChart);
+            })
 
         // An entry point to calculate and draw the complex or user-defined charts
+        const chartsContainer = $("#charts-container");
+
         const complexChartsCalculators = [
             calculateTopMaxRemainingSubsequences(shuffles)
         ];
-        Promise
-            .all(complexChartsCalculators)
-            .then(result => {
+
+        complexChartsCalculators.map(promise => promise
+            .then(chartData => {
                 // Clean up all the previously dynamically created charts
-                $("div[id^='complex-chart-']").each(function() {
-                    $(this).remove();
-                });
-
-                return result;
+                $(`#complex-chart-${chartData.chartId}`).remove();
+                return chartData;
             })
-            .then(result => {
-                const chartsContainer = $("#charts-container");
-
-                for (const chartData of result) {
+            .then(
+                chartData => {
                     // Validate result
                     const validationError = validateComplexChartData(chartData);
                     if (validationError) {
                         console.error(validationError.message);
                         console.error(validationError.dataItem);
                         // TODO: Visualize the error message
-                        continue;
+                        return;
                     }
 
                     // The chart's canvases will be generated dynamically
@@ -80,14 +80,15 @@ function recalculateAnalytics() {
 
                     // Draw the chart
                     drawChart(chartData);
+                },
+                error => {
+                    console.error("Unable to calculate the complex charts data. The reason is as follows:");
+                    console.error(error);
+                    // TODO: Visualize the error message
                 }
-            },
-            error => {
-                console.error("Unable to calculate the complex charts data. The reason is as follows:");
-                console.error(error);
-                // TODO: Visualize the error message
-            });
-    })
+            )
+        );
+    });
 }
 
 function drawChart({chartId, chartTitle, data}) {
@@ -156,51 +157,53 @@ function counstructNewChartMarkup(chartId) {
 }
 
 function calculatePredefinedChartsData(shuffles) {
-    const optionsFirst = {};
-    const optionsLast = {};
-    const optionsRemaining = {};
+    return new Promise(async (resolve) => {
+        const optionsFirst = {};
+        const optionsLast = {};
+        const optionsRemaining = {};
 
-    for (const {original, shuffled} of shuffles) {
-        const firstShuffledOption = shuffled[0];
-        if (optionsFirst[firstShuffledOption]) {
-            optionsFirst[firstShuffledOption]++;
-        } else {
-            optionsFirst[firstShuffledOption] = 1;
-        }
+        for (const {original, shuffled} of shuffles) {
+            const firstShuffledOption = shuffled[0];
+            if (optionsFirst[firstShuffledOption]) {
+                optionsFirst[firstShuffledOption]++;
+            } else {
+                optionsFirst[firstShuffledOption] = 1;
+            }
 
-        const lastShuffledOption = shuffled[shuffled.length - 1];
-        if (optionsLast[lastShuffledOption]) {
-            optionsLast[lastShuffledOption]++;
-        } else {
-            optionsLast[lastShuffledOption] = 1;
-        }
+            const lastShuffledOption = shuffled[shuffled.length - 1];
+            if (optionsLast[lastShuffledOption]) {
+                optionsLast[lastShuffledOption]++;
+            } else {
+                optionsLast[lastShuffledOption] = 1;
+            }
 
-        for (const originalIndex in original) {
-            if (original[originalIndex] === shuffled[originalIndex]) {
-                const optionRemaining = shuffled[originalIndex];
-                if (optionsRemaining[optionRemaining]) {
-                    optionsRemaining[optionRemaining]++;
-                } else {
-                    optionsRemaining[optionRemaining] = 1;
+            for (const originalIndex in original) {
+                if (original[originalIndex] === shuffled[originalIndex]) {
+                    const optionRemaining = shuffled[originalIndex];
+                    if (optionsRemaining[optionRemaining]) {
+                        optionsRemaining[optionRemaining]++;
+                    } else {
+                        optionsRemaining[optionRemaining] = 1;
+                    }
                 }
             }
         }
-    }
 
-    const topFirst = Object.keys(optionsFirst)
-        .map((optionName) => ({title: optionName, value: optionsFirst[optionName]}))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, maxTopCount);
-    const topLast = Object.keys(optionsLast)
-        .map((optionName) => ({title: optionName, value: optionsLast[optionName]}))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, maxTopCount);
-    const topRemaining = Object.keys(optionsRemaining)
-        .map((optionName) => ({title: optionName, value: optionsRemaining[optionName]}))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, maxTopCount);
+        const topFirst = Object.keys(optionsFirst)
+            .map((optionName) => ({title: optionName, value: optionsFirst[optionName]}))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, maxTopCount);
+        const topLast = Object.keys(optionsLast)
+            .map((optionName) => ({title: optionName, value: optionsLast[optionName]}))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, maxTopCount);
+        const topRemaining = Object.keys(optionsRemaining)
+            .map((optionName) => ({title: optionName, value: optionsRemaining[optionName]}))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, maxTopCount);
 
-    return [topFirst, topLast, topRemaining];
+        resolve([topFirst, topLast, topRemaining]);
+    });
 }
 
 async function calculateTopMaxRemainingSubsequences(shuffles) {
