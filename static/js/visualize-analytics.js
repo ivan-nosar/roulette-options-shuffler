@@ -255,7 +255,7 @@ async function calculateTopMaxRemainingSubsequences(shuffles) {
 
         resolve({
             chartId: "topMaxRemainingSubsequences",
-            chartTitle: 'Top 5 maximum remaining shuffled subsequences',
+            chartTitle: 'Top 5 maximum remaining subsequences',
             data
         });
     });
