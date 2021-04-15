@@ -227,14 +227,17 @@ async function calculateTopMaxRemainingSubsequences(shuffles) {
 
             // Calculate the longest common continuous subsequence
             let maxLength = 1;
+            let currentLength = 1;
             let maxSubsequence = original[firstCommonIndex];
             for (let i = firstCommonIndex + 1; i <= lastCommonIndex; i++) {
                 if (original[i] === shuffled[i]) {
-                    maxLength++;
-                    maxSubsequence += maxLength === 1 ? `${original[i]}` : `-${original[i]}`;
+                    currentLength++;
+                    if (currentLength > maxLength) {
+                        maxSubsequence += currentLength === 1 ? `${original[i]}` : `-${original[i]}`;
+                        maxLength = currentLength;
+                    }
                 } else {
-                    maxLength = 0;
-                    maxSubsequence = "";
+                    currentLength = 0;
                 }
             }
 
