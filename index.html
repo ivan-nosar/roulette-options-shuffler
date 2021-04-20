@@ -12,6 +12,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="./static/css/bootstrap.min.css">
     <link rel="stylesheet" href="./static/css/slotmachine.css">
+    <link rel="stylesheet" href="./static/css/roulette-options-shuffler.css">
     <link rel="stylesheet" href="./static/fonts/roboto.css">
 
     <title>Roulette options shuffler</title>
@@ -105,14 +106,41 @@
         <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
             <div class="container-fluid my-3">
                 <div id="charts-container" class="row row-cols-2">
-                    <div class="col">
-                        <canvas id="topFirstChart"></canvas>
+                    <div class="col chart-base">
+                        <canvas id="topFirstChart" class="chart-canvas"></canvas>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col text-center">
+                                    <div id="topFirstSpinner" class="spinner-border spinner-big text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col">
-                        <canvas id="topLastChart"></canvas>
+                    <div class="col chart-base">
+                        <canvas id="topLastChart" class="chart-canvas"></canvas>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col text-center">
+                                    <div id="topLastSpinner" class="spinner-border spinner-big text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col">
-                        <canvas id="topRemainingChart"></canvas>
+                    <div class="col chart-base">
+                        <canvas id="topRemainingChart" class="chart-canvas"></canvas>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col text-center">
+                                    <div id="topRemainingSpinner" class="spinner-border spinner-big text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
