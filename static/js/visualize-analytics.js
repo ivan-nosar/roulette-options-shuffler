@@ -179,20 +179,16 @@ function counstructNewChartMarkup(chartId) {
 
 function constructChartArea(index) {
     return `<div class="col chart-base" id="chart-area-${index}">
-        <div class="container h-100">
+        <div id="complexChartSpinner-${index}" class="container h-100">
             <div class="row align-items-center h-100">
                 <div class="col text-center">
-                    <div id="complexChartSpinner-${index}" class="spinner-border spinner-big text-primary" role="status">
+                    <div class="spinner-border spinner-big text-primary" role="status">
                         <span class="sr-only">Loading...</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>`;
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function calculatePredefinedChartsData(shuffles) {
@@ -240,8 +236,6 @@ function calculatePredefinedChartsData(shuffles) {
             .map((optionName) => ({title: optionName, value: optionsRemaining[optionName]}))
             .sort((a, b) => b.value - a.value)
             .slice(0, maxTopCount);
-
-        await sleep(350);
 
         resolve([topFirst, topLast, topRemaining]);
     });
@@ -299,8 +293,6 @@ async function calculateTopMaxRemainingSubsequences(shuffles) {
             .map((subsequenceName) => ({title: subsequenceName, value: foundSubsequences[subsequenceName]}))
             .sort((a, b) => b.value - a.value)
             .slice(0, maxTopCount);
-
-        await sleep(350);
 
         resolve({
             chartId: "topMaxRemainingSubsequences",
