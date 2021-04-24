@@ -30,8 +30,8 @@ function onSpinClick() {
     // Find all `li` tags which ids starts with `option-div` and get the values of the underlying inputs
     const options = [...$(`li[id^="${optionsDivIdPrefix}"] input`)].map(x => x.value);
 
-    // Clear slots-root contatiner
-    const slotsRoot = $("#slots-root")
+    // Clear slots-machine contatiner
+    const slotsRoot = $("#slots-machine")
     slotsRoot.empty();
 
     // Prepare markup
@@ -45,7 +45,7 @@ function onSpinClick() {
     const optionSpinnerMarkups = [];
     for (const optionIndex in options) {
         optionSpinnerMarkups.push(`
-            <div id="slots-${optionIndex}" class="slotwrapper">
+            <div id="slots-${optionIndex}">
                 ${optionsListTemplate}
             </div>
         `);
