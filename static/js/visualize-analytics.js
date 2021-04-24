@@ -1,32 +1,3 @@
-const backgroundChartColors = [
-    "rgba(255, 152, 0, 0.2)",
-    "rgba(76, 175, 80, 0.2)",
-    "rgba(33, 150, 243, 0.2)",
-    "rgba(156, 39, 176, 0.2)",
-    "rgba(158, 158, 158, 0.2)",
-    "rgba(192, 202, 51, 0.2)",
-    "rgba(255, 235, 59, 0.2)",
-    "rgba(96, 125, 139, 0.2)",
-    "rgba(0, 188, 212, 0.2)",
-    "rgba(255, 193, 7, 0.2)",
-    "rgba(156, 39, 176, 0.2)",
-    "rgba(244, 67, 54, 0.2)"
-];
-const borderChartColors = [
-    "rgba(255, 152, 0, 1)",
-    "rgba(76, 175, 80, 1)",
-    "rgba(33, 150, 243, 1)",
-    "rgba(156, 39, 176, 1)",
-    "rgba(158, 158, 158, 1)",
-    "rgba(192, 202, 51, 1)",
-    "rgba(255, 235, 59, 1)",
-    "rgba(96, 125, 139, 1)",
-    "rgba(0, 188, 212, 1)",
-    "rgba(255, 193, 7, 1)",
-    "rgba(156, 39, 176, 1)",
-    "rgba(244, 67, 54, 1)"
-];
-
 const maxTopCount = 5;
 
 const charts = [];
@@ -112,6 +83,24 @@ function recalculateAnalytics() {
     });
 }
 
+// https://stackoverflow.com/a/16348977
+function getColor(title, alpha = 1) {
+	let hash = 0;
+
+	for (let i = 0; i < title.length; i++) {
+		hash = title.charCodeAt(i) + ((hash << 5) - hash);
+	}
+
+	let color = 'rgba(';
+
+	for (let i = 0; i < 3; i++) {
+        const value = (hash >> (i * 8)) & 0xFF;
+		color += `${value}, `;
+	}
+
+	return `${color}${alpha})`;
+}
+
 function drawChart({chartId, chartTitle, data}) {
     const chartContext = document.getElementById(chartId).getContext("2d");
     charts.push(new Chart(chartContext, {
@@ -120,8 +109,8 @@ function drawChart({chartId, chartTitle, data}) {
             labels: data.map(optionStatistics => optionStatistics.title),
             datasets: [{
                 data: data.map(optionStatistics => optionStatistics.value),
-                backgroundColor: backgroundChartColors,
-                borderColor: borderChartColors,
+                backgroundColor: data.map(optionStatistics => getColor(optionStatistics.title, 0.2)),
+                borderColor: data.map(optionStatistics => getColor(optionStatistics.title)),
                 borderWidth: 1
             }]
         },
