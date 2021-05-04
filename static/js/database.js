@@ -1,6 +1,8 @@
 const databaseName = "analytics";
 const shufflesStoreName = "shuffles";
-const databaseSchemaVersion = 1;
+const settingsStoreName = "settings";
+const settingsKey = "stored-settings";
+const databaseSchemaVersion = 2;
 
 const pleaseReloadPageMessage =
     "It seems like you're using the outdated version of the site.\n" +
@@ -18,14 +20,17 @@ function onOpenDbUpgradeNeeded(event) {
             // Database is not existed
             initializeDb(db);
         }
+        case 2: {
+            addSettingsStore(db);
+        }
         // Add new `case` branches in order to cover the new revisions of database schema
     }
 }
 
 function onOpenDbError(event) {
     const errorMessage = event.target.error.message;
-    const requestedVersion = errorMessage.slice(errorMessage.indexOf('(') + 1, errorMessage.indexOf(')'));
-    const existingVersion = errorMessage.slice(errorMessage.lastIndexOf('(') + 1, errorMessage.lastIndexOf(')'));
+    const requestedVersion = errorMessage.slice(errorMessage.indexOf("(") + 1, errorMessage.indexOf(")"));
+    const existingVersion = errorMessage.slice(errorMessage.lastIndexOf("(") + 1, errorMessage.lastIndexOf(")"));
     if (existingVersion > requestedVersion) {
         console.warn(event.target.error.message);
         alert(pleaseReloadPageMessage);
@@ -44,6 +49,10 @@ function initializeDb(db) {
     db.createObjectStore(shufflesStoreName, {
         autoIncrement: true
     });
+}
+
+function addSettingsStore(db) {
+    db.createObjectStore(settingsStoreName);
 }
 
 function onOpenDbSuccess(callback) {
@@ -149,8 +158,90 @@ function eraseShuffles() {
     };
 }
 
+async function updateSettings(settings, onSucessCallback) {
+    if (database === null) {
+        console.error("Database connection was not established. Page reload is required");
+        alert(pleaseReloadPageMessage);
+        return;
+    }
+
+    const transaction = database.transaction(settingsStoreName, "readwrite");
+    const settingsStorage = transaction.objectStore(settingsStoreName);
+
+    const request = settingsStorage.put(settings, settingsKey);
+
+    request.onsuccess = function () {
+        console.log("Settings has been saved successfully");
+        if (typeof onSucessCallback === "function") {
+            onSucessCallback(settings);
+        }
+    };
+
+    request.onerror = function (event) {
+        console.error("Saving the settings ended with an error. The reason is as follows:");
+        console.error(event.target.error);
+        event.stopPropagation();
+    };
+}
+
+function getSettings(callback) {
+    if (database === null) {
+        console.log("Here");
+        console.error("Database connection was not established. Page reload is required");
+        alert(pleaseReloadPageMessage);
+        return;
+    }
+
+    const transaction = database.transaction(settingsStoreName, "readwrite");
+    const settingsStorage = transaction.objectStore(settingsStoreName);
+
+    const request = settingsStorage.get(settingsKey);
+
+    request.onsuccess = function (event) {
+        if (typeof callback === "function") {
+            callback(event.target.result);
+        }
+    };
+
+    request.onerror = function (event) {
+        console.error("Unable to select shuffles. The reason is as follows:");
+        console.error(event.target.error);
+        event.stopPropagation();
+    };
+}
+
+function eraseSettings() {
+    if (database === null) {
+        console.error("Database connection was not established. Page reload is required");
+        alert(pleaseReloadPageMessage);
+        return;
+    }
+
+    const transaction = database.transaction(settingsStoreName, "readwrite");
+    const settingsStorage = transaction.objectStore(settingsStoreName);
+    const request = settingsStorage.clear();
+
+    request.onsuccess = function () {
+        console.log("Settings storage has been erased successfully");
+    };
+
+    request.onerror = function (event) {
+        console.error("Settings storage erasing ended with an error. The reason is as follows:");
+        console.error(event.target.error);
+        event.stopPropagation();
+    };
+}
+
+function listenOnDatabaseOpenedEvent(callback) {
+    onDatabaseOpenedEvent.push(callback);
+}
+
 let database = null;
+const onDatabaseOpenedEvent = [];
 
 openDatabase(openedDatabase => {
     database = openedDatabase;
+    for (const callback of onDatabaseOpenedEvent) {
+        callback(database);
+    }
 });

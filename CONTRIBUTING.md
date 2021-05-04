@@ -23,6 +23,8 @@ This project is using a number of dependencies. This repository contains the min
 - [Chart.js](https://www.chartjs.org/docs/latest/): Provides a simple HTML5 API to draw the charts inside the <canvas> tag
   - [static/js/Chart.js](./static/js/Chart.js/)
 
+Also the [`ColorHash`](https://github.com/RolandR/ColorHash) library is used with some codestyle polishemnts. Grand merci to Roland Rytz for your great idea and brilliant implementation.
+
 # Thank You!
 
 Your contributions to open source, large or small, make this project possible. Thank you for taking the time to contribute.

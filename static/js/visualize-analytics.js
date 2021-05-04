@@ -1,8 +1,37 @@
+const predefinedBackgroundChartColors = [
+    "rgba(33, 150, 243, 0.2)",
+    "rgba(76, 175, 80, 0.2)",
+    "rgba(179, 0, 0, 0.2)",
+    "rgba(156, 39, 176, 0.2)",
+    "rgba(255, 217, 25, 0.2)",
+    "rgba(192, 202, 51, 0.2)",
+    "rgba(255, 235, 59, 0.2)",
+    "rgba(96, 125, 139, 0.2)",
+    "rgba(0, 188, 212, 0.2)",
+    "rgba(255, 193, 7, 0.2)",
+    "rgba(158, 158, 158, 0.2)",
+    "rgba(244, 67, 54, 0.2)"
+];
+const predefinedBorderChartColors = [
+    "rgba(33, 150, 243, 1)",
+    "rgba(76, 175, 80, 1)",
+    "rgba(179, 0, 0, 1)",
+    "rgba(156, 39, 176, 1)",
+    "rgba(255, 217, 25, 1)",
+    "rgba(192, 202, 51, 1)",
+    "rgba(255, 235, 59, 1)",
+    "rgba(96, 125, 139, 1)",
+    "rgba(0, 188, 212, 1)",
+    "rgba(255, 193, 7, 1)",
+    "rgba(158, 158, 158, 1)",
+    "rgba(244, 67, 54, 1)"
+];
+
 const maxTopCount = 5;
 
 const charts = [];
 
-function recalculateAnalytics() {
+function recalculateAnalytics(settings) {
     selectShuffles(shuffles => {
         // Free canvas resources
         if (charts.length) {
@@ -35,7 +64,7 @@ function recalculateAnalytics() {
                     $(`#${chartData.chartId}`).show();
 
                     // Draw chart
-                    drawChart(chartData);
+                    drawChart(chartData, settings.chartsColorScheme);
                 });
             });
 
@@ -59,7 +88,6 @@ function recalculateAnalytics() {
                     if (validationError) {
                         console.error(validationError.message);
                         console.error(validationError.dataItem);
-                        // TODO: Visualize the error message
                         return;
                     }
 
@@ -71,46 +99,29 @@ function recalculateAnalytics() {
                     $(`#complexChartSpinner-${index}`).hide();
 
                     // Draw the chart
-                    drawChart(chartData);
+                    drawChart(chartData, settings.chartsColorScheme);
                 },
                 error => {
                     console.error("Unable to calculate the complex charts data. The reason is as follows:");
                     console.error(error);
-                    // TODO: Visualize the error message
                 }
             )
         );
     });
 }
 
-// https://stackoverflow.com/a/16348977
-function getColor(title, alpha = 1) {
-	let hash = 0;
-
-	for (let i = 0; i < title.length; i++) {
-		hash = title.charCodeAt(i) + ((hash << 5) - hash);
-	}
-
-	let color = 'rgba(';
-
-	for (let i = 0; i < 3; i++) {
-        const value = (hash >> (i * 8)) & 0xFF;
-		color += `${value}, `;
-	}
-
-	return `${color}${alpha})`;
-}
-
-function drawChart({chartId, chartTitle, data}) {
+function drawChart({chartId, chartTitle, data}, colorScheme) {
     const chartContext = document.getElementById(chartId).getContext("2d");
+    const backgroundColor = getBackgroundColorForScheme(colorScheme, data);
+    const borderColor = getBorderColorForScheme(colorScheme, data);
     charts.push(new Chart(chartContext, {
         type: "bar",
         data: {
             labels: data.map(optionStatistics => optionStatistics.title),
             datasets: [{
                 data: data.map(optionStatistics => optionStatistics.value),
-                backgroundColor: data.map(optionStatistics => getColor(optionStatistics.title, 0.2)),
-                borderColor: data.map(optionStatistics => getColor(optionStatistics.title)),
+                backgroundColor,
+                borderColor,
                 borderWidth: 1
             }]
         },
@@ -134,6 +145,37 @@ function drawChart({chartId, chartTitle, data}) {
             }
         }
     }));
+}
+
+function getBackgroundColorForScheme(colorScheme, data) {
+    switch (colorScheme) {
+        case "predefined": return predefinedBackgroundChartColors;
+        case "dynamic": return data.map(item => colorHash(item.title, 0.2));
+        default: throw new Error(`Unknow color scheme: ${colorScheme}`);
+    }
+}
+
+function getBorderColorForScheme(colorScheme, data) {
+    switch (colorScheme) {
+        case "predefined": return predefinedBorderChartColors;
+        case "dynamic": return data.map(item => colorHash(item.title));
+        default: throw new Error(`Unknow color scheme: ${colorScheme}`);
+    }
+}
+
+// https://github.com/RolandR/ColorHash
+function colorHash(inputString, alpha = 1){
+    let sum = 0;
+
+    for(let i in inputString){
+        sum += inputString.charCodeAt(i);
+    }
+
+    r = ~~(('0.' + Math.sin(sum + 1).toString().substr(6)) * 256);
+    g = ~~(('0.' + Math.sin(sum + 2).toString().substr(6)) * 256);
+    b = ~~(('0.' + Math.sin(sum + 3).toString().substr(6)) * 256);
+
+    return `rgba(${r},${g},${b},${alpha})`;
 }
 
 function validateComplexChartData(chartData) {

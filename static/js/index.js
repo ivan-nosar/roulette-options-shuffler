@@ -33,8 +33,21 @@ const queryString = window.location.search
 const query = parseQueryString(queryString);
 
 $(document).ready(() => {
+    listenOnDatabaseOpenedEvent(() => {
+        getSettings(settings => {
+            if (!isSettingsValid(settings)) {
+                const defaultSettings = constructDefaultSettings();
+                updateSettings(defaultSettings, updateChartCoorSchemeDropdownTitle);
+            } else {
+                updateChartCoorSchemeDropdownTitle(settings);
+            }
+        });
+    });
+
     // Recalculate the analytics every time the each tab is shown
-    $('#analytics-tab').on('shown.bs.tab', function (event) {
-        recalculateAnalytics();
-    })
+    $("#analytics-tab").on("shown.bs.tab", function () {
+        getSettings(settings => {
+            recalculateAnalytics(settings);
+        });
+    });
 });
