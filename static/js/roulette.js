@@ -5,11 +5,12 @@ function addNewOption(optionTitle) {
     const newIndex = optionsList[0].childElementCount;
 
     const optionDivId = `${optionsDivIdPrefix}-${newIndex}`;
+    console.log(optionDivId);
     const optionDivMarkup = `
         <li class="input-group my-1" id="${optionDivId}">
             <input class="form-control" type="text" placeholder="Set your option" value="${optionTitle}">
             <div class="input-group-append">
-                <button class="btn btn-outline-primary" type="button" onclick="deleteOption("${optionDivId}")">
+                <button class="btn btn-outline-primary" type="button" onclick="deleteOption('${optionDivId}')">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
