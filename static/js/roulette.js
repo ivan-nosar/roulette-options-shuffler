@@ -5,7 +5,6 @@ function addNewOption(optionTitle) {
     const newIndex = optionsList[0].childElementCount;
 
     const optionDivId = `${optionsDivIdPrefix}-${newIndex}`;
-    console.log(optionDivId);
     const optionDivMarkup = `
         <li class="input-group my-1" id="${optionDivId}">
             <input class="form-control" type="text" placeholder="Set your option" value="${optionTitle}">

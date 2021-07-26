@@ -15,15 +15,13 @@ const pleaseCloseOtherTabsMessage =
 
 function onOpenDbUpgradeNeeded(event) {
     const db = event.target.result;
-    switch (db.version) {
-        case 1: {
-            // Database is not existed
-            initializeDb(db);
-        }
-        case 2: {
-            addSettingsStore(db);
-        }
-        // Add new `case` branches in order to cover the new revisions of database schema
+
+    if (db.version >= 1) {
+        initializeDb(db);
+    }
+
+    if (db.version >= 2) {
+        addSettingsStore(db);
     }
 }
 
